@@ -1,6 +1,10 @@
 package main
 
-import "strings"
+import (
+	"fmt"
+	"os"
+	"strings"
+)
 
 func cleanInput(text string) []string {
 	var textWords []string
@@ -14,4 +18,24 @@ func cleanInput(text string) []string {
 		}
 	}
 	return textWords
+}
+
+func commandExit() error {
+	fmt.Println("Closing the Pokedex... Goodbye!")
+	os.Exit(0)
+	return nil
+}
+
+func commandLookup(input string, commands commandMap) {
+	commandFound := false
+	for _, c := range commands {
+		if strings.ToLower(input) == c.name {
+			commandFound = true
+			c.callback()
+			break
+		}
+	}
+	if !commandFound {
+		fmt.Println("Unknown command")
+	}
 }
