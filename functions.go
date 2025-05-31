@@ -6,6 +6,17 @@ import (
 	"strings"
 )
 
+func getCommands() commandMap {
+	commands := commandMap{
+		"exit": {
+			name:        "exit",
+			description: "Exit the Pokedex",
+			callback:    commandExit,
+		},
+	}
+	return commands
+}
+
 func cleanInput(text string) []string {
 	var textWords []string
 	text = strings.ToLower(text)
@@ -26,16 +37,20 @@ func commandExit() error {
 	return nil
 }
 
-func commandLookup(input string, commands commandMap) {
-	commandFound := false
+func commandLookup(input string, commands commandMap) (command cliCommand, err error) {
 	for _, c := range commands {
 		if strings.ToLower(input) == c.name {
-			commandFound = true
-			c.callback()
-			break
+			return c, nil
 		}
 	}
-	if !commandFound {
-		fmt.Println("Unknown command")
+	return cliCommand{}, fmt.Errorf("unknown command")
+}
+
+func commandLookupAndExecute(input string, commands commandMap) error {
+	command, err := commandLookup(input, commands)
+	if err != nil {
+		return err
 	}
+	command.callback()
+	return nil
 }

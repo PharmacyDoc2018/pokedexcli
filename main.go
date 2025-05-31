@@ -7,19 +7,16 @@ import (
 )
 
 func main() {
-	commands := commandMap{
-		"exit": {
-			name:        "exit",
-			description: "Exit the Pokedex",
-			callback:    commandExit,
-		},
-	}
+	commands := getCommands()
 
 	pokeScanner := bufio.NewScanner(os.Stdin)
 	fmt.Printf("Pokedex > ")
 	for pokeScanner.Scan() {
 		input := pokeScanner.Text()
-		commandLookup(input, commands)
+		err := commandLookupAndExecute(input, commands)
+		if err != nil {
+			fmt.Println(err)
+		}
 		fmt.Printf("Pokedex > ")
 	}
 
