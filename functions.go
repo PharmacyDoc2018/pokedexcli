@@ -13,6 +13,11 @@ func getCommands() commandMap {
 			description: "Exit the Pokedex",
 			callback:    commandExit,
 		},
+		"help": {
+			name:        "help",
+			description: "Displays a help message",
+			callback:    commandHelp,
+		},
 	}
 	return commands
 }
@@ -34,6 +39,16 @@ func cleanInput(text string) []string {
 func commandExit() error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
+	return nil
+}
+
+func commandHelp() error {
+	fmt.Println("Welcome to the Pokedex!")
+	fmt.Printf("Usage:\n\n")
+	commands := getCommands()
+	for _, c := range commands {
+		fmt.Printf("%s: %s\n", c.name, c.description)
+	}
 	return nil
 }
 

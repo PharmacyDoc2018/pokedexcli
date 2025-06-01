@@ -17,6 +17,7 @@ func main() {
 		if err != nil {
 			fmt.Println(err)
 		}
+		fmt.Printf("\n")
 		fmt.Printf("Pokedex > ")
 	}
 
