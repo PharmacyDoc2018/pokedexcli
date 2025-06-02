@@ -51,13 +51,13 @@ func cleanInput(text string) []string {
 	return textWords
 }
 
-func commandExit(any) error {
+func commandExit(*config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(any) error {
+func commandHelp(*config) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Printf("Usage:\n\n")
 	commands := getCommands()
@@ -67,32 +67,24 @@ func commandHelp(any) error {
 	return nil
 }
 
-func commandMap(c any) error {
-	value, ok := c.(*config)
-	if !ok {
-		return fmt.Errorf("error: mapConfig pointer needed")
-	}
-	err := getLocationAreas(&value.pokeMap, false)
+func commandMap(c *config) error {
+	err := getLocationAreas(c, false)
 	if err != nil {
 		return err
 	}
-	for i := 0; i < len(value.pokeMap.Results); i++ {
-		fmt.Println(value.pokeMap.Results[i].Name)
+	for i := 0; i < len(c.pokeMap.Results); i++ {
+		fmt.Println(c.pokeMap.Results[i].Name)
 	}
 	return nil
 }
 
-func commandMapB(c any) error {
-	value, ok := c.(*config)
-	if !ok {
-		return fmt.Errorf("error: mapConfig pointer needed")
-	}
-	err := getLocationAreas(&value.pokeMap, true)
+func commandMapB(c *config) error {
+	err := getLocationAreas(c, true)
 	if err != nil {
 		return err
 	}
-	for i := 0; i < len(value.pokeMap.Results); i++ {
-		fmt.Println(value.pokeMap.Results[i].Name)
+	for i := 0; i < len(c.pokeMap.Results); i++ {
+		fmt.Println(c.pokeMap.Results[i].Name)
 	}
 	return nil
 }
@@ -106,7 +98,7 @@ func commandLookup(input string, commands commandMapList) (command cliCommand, e
 	return cliCommand{}, fmt.Errorf("unknown command")
 }
 
-func commandLookupAndExecute(input string, commands commandMapList, config any) error {
+func commandLookupAndExecute(input string, commands commandMapList, config *config) error {
 	command, err := commandLookup(input, commands)
 	if err != nil {
 		return err

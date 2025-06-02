@@ -6,18 +6,18 @@ import (
 	"net/http"
 )
 
-func getLocationAreas(config *mapConfig, isPrevious bool) error {
+func getLocationAreas(config *config, isPrevious bool) error {
 	var url string
 	switch isPrevious {
 	case false:
-		if config.Next != nil {
-			url = *config.Next
+		if config.pokeMap.Next != nil {
+			url = *config.pokeMap.Next
 		} else {
 			url = "https://pokeapi.co/api/v2/location-area"
 		}
 	case true:
-		if config.Previous != nil {
-			url = *config.Previous
+		if config.pokeMap.Previous != nil {
+			url = *config.pokeMap.Previous
 		} else {
 			return fmt.Errorf("you're on the first page")
 		}
@@ -34,7 +34,7 @@ func getLocationAreas(config *mapConfig, isPrevious bool) error {
 	}
 
 	decoder := json.NewDecoder(res.Body)
-	err = decoder.Decode(&config)
+	err = decoder.Decode(&config.pokeMap)
 	if err != nil {
 		return fmt.Errorf("error decoding response body")
 	}
