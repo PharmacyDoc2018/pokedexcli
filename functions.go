@@ -6,8 +6,8 @@ import (
 	"strings"
 )
 
-func getCommands() commandMap {
-	commands := commandMap{
+func getCommands() commandMapList {
+	commands := commandMapList{
 		"exit": {
 			name:        "exit",
 			description: "Exit the Pokedex",
@@ -18,8 +18,23 @@ func getCommands() commandMap {
 			description: "Displays a help message",
 			callback:    commandHelp,
 		},
+		"map": {
+			name:        "map",
+			description: "displays the names of 20 location areas in the Pokemon world",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "displays the names of the previous 20 location areas",
+			callback:    commandMapB,
+		},
 	}
 	return commands
+}
+
+func initConfig() *config {
+	var config config
+	return &config
 }
 
 func cleanInput(text string) []string {
@@ -52,7 +67,29 @@ func commandHelp(*config) error {
 	return nil
 }
 
-func commandLookup(input string, commands commandMap) (command cliCommand, err error) {
+func commandMap(config *config) error {
+	err := getLocationAreas(config, false)
+	if err != nil {
+		return err
+	}
+	for i := 0; i < len(config.Results); i++ {
+		fmt.Println(config.Results[i].Name)
+	}
+	return nil
+}
+
+func commandMapB(config *config) error {
+	err := getLocationAreas(config, true)
+	if err != nil {
+		return err
+	}
+	for i := 0; i < len(config.Results); i++ {
+		fmt.Println(config.Results[i].Name)
+	}
+	return nil
+}
+
+func commandLookup(input string, commands commandMapList) (command cliCommand, err error) {
 	for _, c := range commands {
 		if strings.ToLower(input) == c.name {
 			return c, nil
@@ -61,11 +98,25 @@ func commandLookup(input string, commands commandMap) (command cliCommand, err e
 	return cliCommand{}, fmt.Errorf("unknown command")
 }
 
-func commandLookupAndExecute(input string, commands commandMap) error {
+func commandLookupAndExecute(input string, commands commandMapList, config *config) error {
 	command, err := commandLookup(input, commands)
 	if err != nil {
 		return err
 	}
-	command.callback(nil)
+
+	if command.name == "map" {
+		err := command.callback(config)
+		if err != nil {
+			return err
+		}
+	} else if command.name == "mapb" {
+		err := command.callback(config)
+		if err != nil {
+			return err
+		}
+	} else {
+		command.callback(nil)
+		return nil
+	}
 	return nil
 }

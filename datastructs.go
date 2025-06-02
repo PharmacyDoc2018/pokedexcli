@@ -6,9 +6,14 @@ type cliCommand struct {
 	callback    func(*config) error
 }
 
-type config struct {
-	nextURL     *string
-	previousURL *string
-}
+type commandMapList map[string]cliCommand
 
-type commandMap map[string]cliCommand
+type config struct {
+	Count    int     `json:"count"`
+	Next     *string `json:"next"`
+	Previous *string `json:"previous"`
+	Results  []struct {
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	} `json:"results"`
+}

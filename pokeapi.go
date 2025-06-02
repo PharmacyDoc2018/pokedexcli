@@ -1,4 +1,4 @@
-package pokeapi
+package main
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func getLocationAreas(config *locationAreaRes, isPrevious bool) error {
+func getLocationAreas(config *config, isPrevious bool) error {
 	var url string
 	switch isPrevious {
 	case false:
@@ -19,7 +19,7 @@ func getLocationAreas(config *locationAreaRes, isPrevious bool) error {
 		if config.Previous != nil {
 			url = *config.Previous
 		} else {
-			return fmt.Errorf("error: no previous map")
+			return fmt.Errorf("you're on the first page")
 		}
 	}
 
