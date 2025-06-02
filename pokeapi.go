@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func getLocationAreas(config *config, isPrevious bool) error {
+func getLocationAreas(config *mapConfig, isPrevious bool) error {
 	var url string
 	switch isPrevious {
 	case false:
