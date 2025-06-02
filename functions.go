@@ -36,13 +36,13 @@ func cleanInput(text string) []string {
 	return textWords
 }
 
-func commandExit() error {
+func commandExit(*config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp() error {
+func commandHelp(*config) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Printf("Usage:\n\n")
 	commands := getCommands()
@@ -66,6 +66,6 @@ func commandLookupAndExecute(input string, commands commandMap) error {
 	if err != nil {
 		return err
 	}
-	command.callback()
+	command.callback(nil)
 	return nil
 }
