@@ -32,7 +32,7 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 }
 
 func (c *Cache) reapLoop(interval time.Duration, stop chan struct{}) {
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 	for {
 		select {
@@ -52,7 +52,9 @@ func (c *Cache) reapLoop(interval time.Duration, stop chan struct{}) {
 }
 
 func NewCache(interval time.Duration, stop chan struct{}) *Cache {
-	var cache Cache
+	cache := &Cache{
+		cacheMap: make(map[string]cacheEntry),
+	}
 	go cache.reapLoop(interval, stop)
-	return &cache
+	return cache
 }
