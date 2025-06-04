@@ -20,8 +20,10 @@ func TestCleanInput(t *testing.T) {
 			input:    "Hi Hello Hey",
 			expected: []string{"hi", "hello", "hey"},
 		},
-		// add more cases here
-
+		{
+			input:    "explore mt-coronet-2f",
+			expected: []string{"explore", "mt-coronet-2f"},
+		},
 	}
 
 	for _, c := range cases {

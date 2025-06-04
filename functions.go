@@ -31,6 +31,11 @@ func getCommands() commandMapList {
 			description: "displays the names of the previous 20 location areas",
 			callback:    commandMapB,
 		},
+		"explore": {
+			name:        "explore",
+			description: "lists pokemon found in the area",
+			callback:    commandExplore,
+		},
 	}
 	return commands
 }
@@ -48,7 +53,7 @@ func initConfig() *config {
 
 func initCache() (*pokecache.Cache, chan struct{}) {
 	stop := make(chan struct{})
-	pokeCache := pokecache.NewCache(30*time.Second, stop)
+	pokeCache := pokecache.NewCache(10*time.Second, stop)
 	return pokeCache, stop
 }
 
@@ -106,9 +111,26 @@ func commandMapB(c *config) error {
 	return nil
 }
 
+func commandExplore(c *config) error {
+	fmt.Printf("Exploring %s...\n", c.lastInput[1])
+	err := getAreaData(c, c.lastInput[1])
+	if err != nil {
+		return err
+	}
+	fmt.Println("Found Pokemon:")
+	for i := 0; i < len(c.pokeAreaData.PokemonEncounters); i++ {
+		fmt.Printf(" - %s\n", c.pokeAreaData.PokemonEncounters[i].Pokemon.Name)
+	}
+	return nil
+}
+
+func cleanInputAndStore(c *config, input string) {
+	c.lastInput = cleanInput(input)
+}
+
 func commandLookup(input string, commands commandMapList) (command cliCommand, err error) {
 	for _, c := range commands {
-		if strings.ToLower(input) == c.name {
+		if input == c.name {
 			return c, nil
 		}
 	}
@@ -116,7 +138,8 @@ func commandLookup(input string, commands commandMapList) (command cliCommand, e
 }
 
 func commandLookupAndExecute(input string, commands commandMapList, config *config) error {
-	command, err := commandLookup(input, commands)
+	cleanInputAndStore(config, input)
+	command, err := commandLookup(config.lastInput[0], commands)
 	if err != nil {
 		return err
 	}
@@ -132,6 +155,8 @@ func commandLookupAndExecute(input string, commands commandMapList, config *conf
 			return err
 		}
 	} else if command.name == "exit" {
+		command.callback(config)
+	} else if command.name == "explore" {
 		command.callback(config)
 	} else {
 		command.callback(nil)
