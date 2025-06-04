@@ -23,6 +23,15 @@ func getLocationAreas(config *config, isPrevious bool) error {
 		}
 	}
 
+	cachedData, ok := config.cache.Get(url)
+	if ok {
+		err := json.Unmarshal(cachedData, &config.pokeMap)
+		if err != nil {
+			return fmt.Errorf("error: unable to unmarshal cached data")
+		}
+		return nil
+	}
+
 	res, err := http.Get(url)
 	if err != nil {
 		return fmt.Errorf("error: no response from server")
