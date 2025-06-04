@@ -144,23 +144,20 @@ func commandLookupAndExecute(input string, commands commandMapList, config *conf
 		return err
 	}
 
-	if command.name == "map" {
+	switch command.name {
+	case "map":
+		fallthrough
+	case "mapb":
+		fallthrough
+	case "exit":
+		fallthrough
+	case "explore":
 		err := command.callback(config)
 		if err != nil {
 			return err
 		}
-	} else if command.name == "mapb" {
-		err := command.callback(config)
-		if err != nil {
-			return err
-		}
-	} else if command.name == "exit" {
-		command.callback(config)
-	} else if command.name == "explore" {
-		command.callback(config)
-	} else {
+	default:
 		command.callback(nil)
-		return nil
 	}
 	return nil
 }
