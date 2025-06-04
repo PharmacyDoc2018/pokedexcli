@@ -8,7 +8,7 @@ import (
 
 func main() {
 	commands := getCommands()
-	config := initConfig()
+	config := initREPL()
 
 	pokeScanner := bufio.NewScanner(os.Stdin)
 	fmt.Printf("Pokedex > ")

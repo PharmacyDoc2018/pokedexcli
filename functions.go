@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/PharmacyDoc2018/pokedexcli/internal/pokecache"
 )
 
 func getCommands() commandMapList {
@@ -32,9 +35,21 @@ func getCommands() commandMapList {
 	return commands
 }
 
+func initREPL() *config {
+	config := initConfig()
+	config.cache, config.stop = initCache()
+	return config
+}
+
 func initConfig() *config {
 	var config config
 	return &config
+}
+
+func initCache() (*pokecache.Cache, chan struct{}) {
+	stop := make(chan struct{})
+	pokeCache := pokecache.NewCache(30*time.Second, stop)
+	return pokeCache, stop
 }
 
 func cleanInput(text string) []string {
@@ -51,8 +66,10 @@ func cleanInput(text string) []string {
 	return textWords
 }
 
-func commandExit(*config) error {
+func commandExit(c *config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
+	close(c.stop)
+	time.Sleep(500 * time.Millisecond)
 	os.Exit(0)
 	return nil
 }
@@ -114,6 +131,8 @@ func commandLookupAndExecute(input string, commands commandMapList, config *conf
 		if err != nil {
 			return err
 		}
+	} else if command.name == "exit" {
+		command.callback(config)
 	} else {
 		command.callback(nil)
 		return nil

@@ -31,23 +31,28 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 	return entry.val, ok
 }
 
-func (c *Cache) reapLoop(interval time.Duration) {
+func (c *Cache) reapLoop(interval time.Duration, stop chan struct{}) {
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
-
-	for t := range ticker.C {
-		c.mu.Lock()
-		for key, value := range c.cacheMap {
-			if t.Sub(value.createdAt) >= interval {
-				delete(c.cacheMap, key)
+	for {
+		select {
+		case <-stop:
+			return
+		case t := <-ticker.C:
+			c.mu.Lock()
+			for key, value := range c.cacheMap {
+				if t.Sub(value.createdAt) >= interval {
+					delete(c.cacheMap, key)
+				}
 			}
+			c.mu.Unlock()
+
 		}
-		c.mu.Unlock()
 	}
 }
 
-func NewCache(interval time.Duration) *Cache {
+func NewCache(interval time.Duration, stop chan struct{}) *Cache {
 	var cache Cache
-	go cache.reapLoop(interval)
+	go cache.reapLoop(interval, stop)
 	return &cache
 }
