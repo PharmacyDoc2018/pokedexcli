@@ -66,10 +66,21 @@ func getLocationAreas(config *config, isPrevious bool) error {
 }
 
 func getAreaData(config *config, area string) error {
-	const baseURL = "https://pokeapi.co/api/v2/location-area"
-	url := baseURL + "/" + area
+	const baseURL = "https://pokeapi.co/api/v2/location-area/"
+	url := baseURL + area
 
 	err := getData(url, config, &config.pokeAreaData)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func getPokemonData(config *config, pokemon string) error {
+	const baseURL = "https://pokeapi.co/api/v2/pokemon/"
+	url := baseURL + pokemon
+
+	err := getData(url, config, &config.pokemonData)
 	if err != nil {
 		return err
 	}

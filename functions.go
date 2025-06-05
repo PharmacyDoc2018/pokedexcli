@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"time"
@@ -36,6 +37,11 @@ func getCommands() commandMapList {
 			description: "lists pokemon found in the area",
 			callback:    commandExplore,
 		},
+		"catch": {
+			name:        "catch",
+			description: "attempts to catch a pokemon",
+			callback:    commandCatch,
+		},
 	}
 	return commands
 }
@@ -47,8 +53,10 @@ func initREPL() *config {
 }
 
 func initConfig() *config {
-	var config config
-	return &config
+	config := &config{
+		pokedex: map[string]pokemonData{},
+	}
+	return config
 }
 
 func initCache() (*pokecache.Cache, chan struct{}) {
@@ -124,6 +132,39 @@ func commandExplore(c *config) error {
 	return nil
 }
 
+func commandCatch(c *config) error {
+	fmt.Printf("Throwing a Pokeball at %s\n", c.lastInput[1])
+	err := getPokemonData(c, c.lastInput[1])
+	if err != nil {
+		return err
+	}
+	baseXP := c.pokemonData.BaseExperience
+	winningNumber := max(int(baseXP/30), 1)
+	winningNumber = min(winningNumber, 5)
+	randomNumber := rand.Intn(winningNumber) + 1
+	if randomNumber == winningNumber {
+		fmt.Printf("%s was caught!\n", c.lastInput[1])
+		isNewEntry := enterDataInPokedex(c)
+		if isNewEntry {
+			fmt.Println("New entry entered into Pokedex!")
+		}
+	} else {
+		fmt.Printf("%s escaped!\n", c.lastInput[1])
+	}
+
+	return nil
+}
+
+func enterDataInPokedex(c *config) bool {
+	pokemon := c.pokemonData.Name
+	_, ok := c.pokedex[pokemon]
+	if !ok {
+		c.pokedex[pokemon] = c.pokemonData
+		return true
+	}
+	return false
+}
+
 func cleanInputAndStore(c *config, input string) {
 	c.lastInput = cleanInput(input)
 }
@@ -152,6 +193,8 @@ func commandLookupAndExecute(input string, commands commandMapList, config *conf
 	case "exit":
 		fallthrough
 	case "explore":
+		fallthrough
+	case "catch":
 		err := command.callback(config)
 		if err != nil {
 			return err
