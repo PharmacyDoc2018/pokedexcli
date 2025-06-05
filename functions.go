@@ -42,6 +42,11 @@ func getCommands() commandMapList {
 			description: "attempts to catch a pokemon",
 			callback:    commandCatch,
 		},
+		"inspect": {
+			name:        "inspect",
+			description: "lookup a pokemon's stats on the Pokedex",
+			callback:    commandInspect,
+		},
 	}
 	return commands
 }
@@ -155,6 +160,30 @@ func commandCatch(c *config) error {
 	return nil
 }
 
+func commandInspect(c *config) error {
+	pokemon := c.lastInput[1]
+	entryExists := isInPokedex(c, pokemon)
+	if !entryExists {
+		fmt.Println("you have not caught that pokemon")
+	} else {
+		fmt.Printf("Name: %s\n", c.pokedex[pokemon].Name)
+		fmt.Printf("Height: %d\n", c.pokedex[pokemon].Height)
+		fmt.Printf("Weight: %d\n", c.pokedex[pokemon].Weight)
+		fmt.Println("Stats:")
+		fmt.Printf("  -hp: %d\n", c.pokedex[pokemon].Stats[0].BaseStat)
+		fmt.Printf("  -attack: %d\n", c.pokedex[pokemon].Stats[1].BaseStat)
+		fmt.Printf("  -defense: %d\n", c.pokedex[pokemon].Stats[2].BaseStat)
+		fmt.Printf("  -special-attack: %d\n", c.pokedex[pokemon].Stats[3].BaseStat)
+		fmt.Printf("  -special-defense: %d\n", c.pokedex[pokemon].Stats[4].BaseStat)
+		fmt.Printf("  -speed: %d\n", c.pokedex[pokemon].Stats[5].BaseStat)
+		fmt.Println("Types:")
+		for i := 0; i < len(c.pokedex[pokemon].Types); i++ {
+			fmt.Println("  -", c.pokedex[pokemon].Types[i].Type.Name)
+		}
+	}
+	return nil
+}
+
 func enterDataInPokedex(c *config) bool {
 	pokemon := c.pokemonData.Name
 	_, ok := c.pokedex[pokemon]
@@ -163,6 +192,11 @@ func enterDataInPokedex(c *config) bool {
 		return true
 	}
 	return false
+}
+
+func isInPokedex(c *config, pokemon string) bool {
+	_, ok := c.pokedex[pokemon]
+	return ok
 }
 
 func cleanInputAndStore(c *config, input string) {
@@ -195,6 +229,8 @@ func commandLookupAndExecute(input string, commands commandMapList, config *conf
 	case "explore":
 		fallthrough
 	case "catch":
+		fallthrough
+	case "inspect":
 		err := command.callback(config)
 		if err != nil {
 			return err
