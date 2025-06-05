@@ -72,7 +72,7 @@ func getAreaData(config *config, area string) error {
 
 	resCode, err := getData(url, config, &config.pokeAreaData)
 	if resCode == 404 {
-		return fmt.Errorf("Location not found!")
+		return fmt.Errorf("location not found")
 	}
 	if err != nil {
 		return err
@@ -86,7 +86,7 @@ func getPokemonData(config *config, pokemon string) error {
 
 	resCode, err := getData(url, config, &config.pokemonData)
 	if resCode == 404 {
-		return fmt.Errorf("pokemon not found!")
+		return fmt.Errorf("pokemon not found")
 	}
 	if err != nil {
 		return err

@@ -19,7 +19,7 @@ func getCommands() commandMapList {
 		},
 		"help": {
 			name:        "help",
-			description: "Displays a help message",
+			description: "displays a help message",
 			callback:    commandHelp,
 		},
 		"map": {
@@ -46,6 +46,11 @@ func getCommands() commandMapList {
 			name:        "inspect",
 			description: "lookup a pokemon's stats on the Pokedex",
 			callback:    commandInspect,
+		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "lists the pokemon in the Pokedex",
+			callback:    commandPokedex,
 		},
 	}
 	return commands
@@ -184,6 +189,19 @@ func commandInspect(c *config) error {
 	return nil
 }
 
+func commandPokedex(c *config) error {
+	if len(c.pokedex) == 0 {
+		fmt.Println("You have no pokemon registered on the Pokedex")
+		return nil
+	}
+
+	fmt.Println("Your Pokedex:")
+	for key := range c.pokedex {
+		fmt.Println(" -", key)
+	}
+	return nil
+}
+
 func enterDataInPokedex(c *config) bool {
 	pokemon := c.pokemonData.Name
 	_, ok := c.pokedex[pokemon]
@@ -231,6 +249,8 @@ func commandLookupAndExecute(input string, commands commandMapList, config *conf
 	case "catch":
 		fallthrough
 	case "inspect":
+		fallthrough
+	case "pokedex":
 		err := command.callback(config)
 		if err != nil {
 			return err
