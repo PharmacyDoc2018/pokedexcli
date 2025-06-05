@@ -133,7 +133,7 @@ func commandExplore(c *config) error {
 }
 
 func commandCatch(c *config) error {
-	fmt.Printf("Throwing a Pokeball at %s\n", c.lastInput[1])
+	fmt.Printf("Throwing a Pokeball at %s...\n", c.lastInput[1])
 	err := getPokemonData(c, c.lastInput[1])
 	if err != nil {
 		return err
